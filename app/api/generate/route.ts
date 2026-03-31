@@ -5,7 +5,11 @@ import PdfDocument from '@/app/components/PdfDocument'
 import React from 'react'
 import { captureLead } from '@/app/lib/pipedrive'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  const key = process.env.RESEND_API_KEY
+  if (!key) throw new Error('RESEND_API_KEY is not configured')
+  return new Resend(key)
+}
 
 async function removeImageBackground(imageBuffer: ArrayBuffer): Promise<ArrayBuffer> {
   const apiKey = process.env.REMOVE_BG_API_KEY
@@ -180,7 +184,7 @@ export async function POST(request: NextRequest) {
       </html>
     `
 
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: 'Hero Network <hello@heronetwork.io>',
       to: [email],
       subject: "Your Custom Filming Guide is Ready! 🎬",
